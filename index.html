@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasvi-Tamagotchi</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f7f0; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 30px; width: 100%; max-width: 400px; text-align: center; }
+        .tamagotchi-screen { background: #e0ebe0; border: 5px solid #4a6741; border-radius: 15px; padding: 20px; margin-bottom: 20px; position: relative; }
+        #plant-emoji { font-size: 80px; margin: 0; }
+        #daily-alert { background: #ffeb3b; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 0.9em; margin-top: 10px; display: none; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; font-size: 0.85em; }
+        .stat-box { background: #f9f9f9; padding: 8px; border-radius: 8px; border: 1px solid #eee; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: transform 0.1s; }
+        button:active { transform: scale(0.95); }
+        .btn-water { background: #4dabf7; color: white; }
+        .btn-feed { background: #fab005; color: white; }
+        .btn-mist { background: #3bc9db; color: white; }
+        .btn-dry { background: #ff922b; color: white; }
+        .weight-check { margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; font-size: 0.8em; color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Kasvivahti 🌱</h2>
+    
+    <div class="tamagotchi-screen">
+        <p id="plant-status">Voi hyvin!</p>
+        <div id="plant-emoji">🌿</div>
+        <div id="daily-alert">Päivän viesti tulee tähän...</div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-box">Kasteltu: <br><span id="last-water">-</span></div>
+        <div class="stat-box">Lannoitettu: <br><span id="last-feed">-</span></div>
+        <div class="stat-box">Suihkutettu: <br><span id="last-mist">-</span></div>
+        <div class="stat-box">Kuivattu: <br><span id="last-dry">-</span></div>
+    </div>
+
+    <div class="actions">
+        <button class="btn-water" onclick="action('water')">Kastele</button>
+        <button class="btn-feed" onclick="action('feed')">Lannoita</button>
+        <button class="btn-mist" onclick="action('mist')">Suihkuta</button>
+        <button class="btn-dry" onclick="action('dry')">Kuivaa multa</button>
+    </div>
+
+    <div class="weight-check">
+        <input type="checkbox" id="weight-check"> 
+        <label for="weight-check">Kokeilin painoa (tuntuu kevyeltä)</label>
+    </div>
+</div>
+
+<script>
+    // Tallennetaan tiedot selaimen muistiin (localStorage)
+    const state = JSON.parse(localStorage.getItem('plantState')) || {
+        water: null, feed: null, mist: null, dry: null, alertDate: null
+    };
+
+    function updateUI() {
+        document.getElementById('last-water').innerText = state.water || 'Ei tiedossa';
+        document.getElementById('last-feed').innerText = state.feed || 'Ei tiedossa';
+        document.getElementById('last-mist').innerText = state.mist || 'Ei tiedossa';
+        document.getElementById('last-dry').innerText = state.dry || 'Ei tiedossa';
+        
+        checkDailyAlert();
+    }
+
+    function action(type) {
+        const now = new Date().toLocaleDateString('fi-FI');
+        state[type] = now;
+        localStorage.setItem('plantState', JSON.stringify(state));
+        
+        // Tamagotchi-reaktio
+        const emoji = document.getElementById('plant-emoji');
+        const status = document.getElementById('plant-status');
+        
+        if(type === 'water') { emoji.innerText = '💧😊'; status.innerText = 'Kiitos vedestä!'; }
+        if(type === 'dry') { emoji.innerText = '☀️😎'; status.innerText = 'Hengitän taas!'; }
+        if(type === 'feed') { emoji.innerText = '💪✨'; status.innerText = 'Nam, ravinteita!'; }
+        if(type === 'mist') { emoji.innerText = '☁️🌿'; status.innerText = 'Ihanan raikasta!'; }
+        
+        setTimeout(() => { emoji.innerText = '🌿'; status.innerText = 'Voi hyvin!'; }, 3000);
+        updateUI();
+    }
+
+    function checkDailyAlert() {
+        const today = new Date().toLocaleDateString('fi-FI');
+        const alertBox = document.getElementById('daily-alert');
+
+        // Näytetään vain yksi ilmoitus päivässä
+        if (state.alertDate !== today) {
+            let message = "";
+            
+            // Logiikka viestille
+            if (state.dry && !state.water) {
+                message = "Tamagotchi: Muistetaanhan, että toivun vielä märkyydestä! ✋";
+            } else if (!state.mist) {
+                message = "Tamagotchi: Ilma tuntuu kuivalta, suihkaus tekisi hyvää! ☁️";
+            } else {
+                message = "Tamagotchi: Tänään on hyvä päivä vain kasvaa! ☀️";
+            }
+
+            alertBox.innerText = message;
+            alertBox.style.display = 'block';
+            
+            // Jos haluat oikean selaimen ilmoituksen (Notification API), se vaatii käyttäjän luvan:
+            // if (Notification.permission === "granted") new Notification(message);
+        }
+    }
+
+    // Tallennetaan ilmoituksen päivämäärä, jotta se pysyy yhtenä per päivä
+    document.body.onclick = () => {
+        const today = new Date().toLocaleDateString('fi-FI');
+        if (state.alertDate !== today) {
+            state.alertDate = today;
+            localStorage.setItem('plantState', JSON.stringify(state));
+        }
+    };
+
+    updateUI();
+</script>
+
+</body>
+</html>
