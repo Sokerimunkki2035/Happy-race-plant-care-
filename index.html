@@ -3,155 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kasvivahti & Tohtori</title>
+    <title>Kasvivahti Pro</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f7f0; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 25px; width: 100%; max-width: 450px; }
-        .tamagotchi-screen { background: #e0ebe0; border: 5px solid #4a6741; border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 20px; position: relative; }
-        #plant-image-display { width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid white; margin: 10px auto; display: block; background: #ccc; }
-        .doctor-section { background: #e3f2fd; border-left: 5px solid #2196f3; padding: 15px; border-radius: 10px; margin-top: 20px; }
-        .info-section { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 0.9em; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
-        .stat-box { background: #fff; padding: 8px; border-radius: 8px; border: 1px solid #eee; text-align: center; font-size: 0.8em; }
+        :root { --main-green: #4a6741; --bg-color: #f0f7f0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); display: flex; justify-content: center; padding: 20px; color: #333; }
+        .card { background: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); padding: 25px; width: 100%; max-width: 450px; }
+        
+        /* Valitsin ja Lisäys */
+        .header-nav { margin-bottom: 20px; display: flex; gap: 10px; flex-direction: column; }
+        select, input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 1rem; box-sizing: border-box; }
+        .btn-add { background: var(--main-green); color: white; border: none; padding: 10px; cursor: pointer; border-radius: 10px; font-weight: bold; }
+
+        /* Tamagotchi-näyttö */
+        .screen { background: #e0ebe0; border: 4px solid var(--main-green); border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 20px; position: relative; }
+        #plant-img { width: 180px; height: 180px; object-fit: cover; border-radius: 50%; border: 4px solid white; background: #eee; margin: 10px auto; display: block; }
+        .upload-btn { background: #fff; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; border: 1px solid #ccc; display: inline-block; }
+
+        /* Tohtori & Ruukku */
+        .box { background: #f9f9f9; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--main-green); }
+        .doctor-box { background: #e3f2fd; border-left-color: #2196f3; }
+        .pot-note { background: #fff9c4; border: 1px dashed #fbc02d; padding: 10px; margin-top: 10px; display: none; font-size: 0.9rem; }
+
+        /* Tilastot ja Napit */
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-item { background: #fff; border: 1px solid #eee; padding: 10px; border-radius: 10px; text-align: center; font-size: 0.8rem; }
         .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        button { border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-main { background: #4a6741; color: white; width: 100%; margin-top: 10px; }
-        .pot-note { background: #fff9c4; border-left: 5px solid #fbc02d; padding: 10px; margin-top: 15px; display: none; font-size: 0.85em; box-shadow: 3px 3px 5px rgba(0,0,0,0.1); }
-        input[type="file"] { display: none; }
-        .upload-label { background: #e8f5e9; padding: 5px 10px; border-radius: 5px; cursor: pointer; display: inline-block; margin-top: 5px; font-size: 0.8em; }
-        select, input { width: 100%; padding: 8px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        .actions button { border: none; padding: 15px; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .actions button:active { transform: scale(0.95); }
+        
+        #image-input { display: none; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="tamagotchi-screen">
-        <h3 id="display-name">Kasvin nimi</h3>
-        <img id="plant-image-display" src="" alt="Kasvin kuva">
-        <label class="upload-label" for="image-input">📸 Ota kuva / rullasta</label>
+    <div class="header-nav">
+        <label style="font-weight:bold;">🌿 Valitse hoidettava kasvi:</label>
+        <select id="plant-selector" onchange="changePlant()"></select>
+        <button class="btn-add" onclick="addNewPlant()">+ Lisää uusi kasvi listaan</button>
+    </div>
+
+    <div class="screen">
+        <h2 id="title-name">Kasvi</h2>
+        <img id="plant-img" src="" alt="Kasvin kuva">
+        <label class="upload-btn" for="image-input">📸 Päivitä kuva</label>
         <input type="file" id="image-input" accept="image/*">
-        <p id="daily-alert" style="background:#fff176; padding:5px; border-radius:5px; font-size:0.8em; margin-top:10px;">Tamagotchi: Odotan hoitoa! ✨</p>
     </div>
 
-    <div class="info-section">
-        <label>Kasvin nimi:</label> 
-        <input type="text" id="plant-name" placeholder="Esim. Afrikan fiikus" onchange="saveInfo()">
-        
-        <label>Nykyinen ruukku (halkaisija cm):</label> 
-        <input type="number" id="current-pot" placeholder="12" onchange="saveInfo()">
-        
-        <button class="btn-main" onclick="checkPot()">📋 Tee ruukku-muistilappu</button>
-        
-        <div id="pot-advice" class="pot-note">
-            <strong>MUISTILAPPU KAUPPAAN:</strong><br>
-            <span id="pot-message"></span>
-        </div>
-    </div>
-
-    <div class="doctor-section">
-        <h4>👨‍⚕️ Kasvitohtorin diagnoosi</h4>
-        <p style="font-size: 0.8em;">Valitse oire, niin tutkitaan onko elossa:</p>
-        <select id="symptom-select" onchange="doctorDiagnose()">
-            <option value="">-- Valitse oire --</option>
-            <option value="brown-stem">Varsi on ruskea ja kuiva</option>
-            <option value="no-leaves">Kaikki lehdet tippuneet</option>
-            <option value="soft-stem">Varsi tuntuu pehmeältä/löllöltä</option>
-            <option value="root-check">Mullan alla on outoa</option>
-        </select>
-        <div id="doctor-result" style="margin-top:10px; font-size:0.85em; font-style:italic; color:#1565c0;"></div>
-    </div>
-
-    <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
-
-    <div class="stats">
-        <div class="stat-box">Kasteltu: <br><span id="last-water">-</span></div>
-        <div class="stat-box">Lannoitettu: <br><span id="last-feed">-</span></div>
-        <div class="stat-box">Suihkutettu: <br><span id="last-mist">-</span></div>
-        <div class="stat-box">Kuivattu: <br><span id="last-dry">-</span></div>
-    </div>
-
-    <div class="actions">
-        <button style="background:#4dabf7; color:white;" onclick="action('water')">Kastele</button>
-        <button style="background:#fab005; color:white;" onclick="action('feed')">Lannoita</button>
-        <button style="background:#3bc9db; color:white;" onclick="action('mist')">Suihkuta</button>
-        <button style="background:#ff922b; color:white;" onclick="action('dry')">Kuivaa multa</button>
-    </div>
-</div>
-
-<script>
-    const state = JSON.parse(localStorage.getItem('plantStateV3')) || {
-        name: "Afrikan fiikus",
-        potSize: 12,
-        water: null, feed: null, mist: null, dry: null,
-        image: null
-    };
-
-    function saveInfo() {
-        state.name = document.getElementById('plant-name').value;
-        state.potSize = document.getElementById('current-pot').value;
-        localStorage.setItem('plantStateV3', JSON.stringify(state));
-        document.getElementById('display-name').innerText = state.name;
-    }
-
-    document.getElementById('image-input').addEventListener('change', function(e) {
-        const reader = new FileReader();
-        reader.onload = function() {
-            state.image = reader.result;
-            document.getElementById('plant-image-display').src = reader.result;
-            saveInfo();
-        }
-        reader.readAsDataURL(e.target.files[0]);
-    });
-
-    function checkPot() {
-        const current = parseInt(state.potSize);
-        const adviceBox = document.getElementById('pot-advice');
-        const message = document.getElementById('pot-message');
-        
-        if (!current) {
-            message.innerText = "Syötä nykyisen ruukun koko yläpuolelle!";
-        } else {
-            const newSizeMin = current + 2;
-            const newSizeMax = current + 4;
-            message.innerHTML = `Osta uusi ruukku: <strong>${newSizeMin} - ${newSizeMax} cm</strong>.<br><br>💡 Vinkki: Jos kasvi on heikko (kuten fiikus nyt), ota mieluummin vain 2 cm suurempi, ettei se huku kosteuteen!`;
-        }
-        adviceBox.style.display = 'block';
-    }
-
-    function doctorDiagnose() {
-        const symptom = document.getElementById('symptom-select').value;
-        const result = document.getElementById('doctor-result');
-        
-        const diagnoses = {
-            "brown-stem": "Raaputa kynnellä vartta: Jos alla on vihreää, kasvi elää! Jos se on ruskeaa ja puumaista loppuun asti, kokeile raaputtaa alempaa läheltä multaa.",
-            "no-leaves": "Monet kasvit lepäävät talvella. Jos varsi on jämäkkä, odota kevään valoa. Älä lannoita nyt!",
-            "soft-stem": "Tämä on huono merkki (usein mätää). Jos varsi on löllö, leikkaa se terveeseen (kovaan) kohtaan asti ja toivo uutta kasvua.",
-            "root-check": "Valkoiset juuret = Hyvä! Ruskeat/haisevat = Leikkaa pois ja vaihda multa. Sinun fiikuksellasi oli onneksi vaaleat juuret!"
-        };
-        
-        result.innerText = diagnoses[symptom] || "";
-    }
-
-    function action(type) {
-        const now = new Date().toLocaleDateString('fi-FI');
-        state[type] = now;
-        saveInfo();
-        updateUI();
-    }
-
-    function updateUI() {
-        document.getElementById('plant-name').value = state.name || "";
-        document.getElementById('display-name').innerText = state.name || "Kasvin nimi";
-        document.getElementById('current-pot').value = state.potSize || "";
-        document.getElementById('last-water').innerText = state.water || "-";
-        document.getElementById('last-feed').innerText = state.feed || "-";
-        document.getElementById('last-mist').innerText = state.mist || "-";
-        document.getElementById('last-dry').innerText = state.dry || "-";
-        if (state.image) document.getElementById('plant-image-display').src = state.image;
-    }
-
-    updateUI();
-</script>
-</body>
-</html>
+    <div class="box">
+        <label>Muokkaa nimeä:</label>
+        <input type="text" id="edit-name" oninput="updateData()">
+        <label style="margin-top:10px; display:block;">Ruukun halkaisija (cm):</
  
