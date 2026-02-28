@@ -3,197 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kasvivahti Pro - Korjattu</title>
+    <title>Kasvivahti - PUHDAS VERSIO</title>
     <style>
         :root { --main-green: #4a6741; --bg-color: #f0f7f0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); display: flex; justify-content: center; padding: 20px; color: #333; }
-        .card { background: white; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); padding: 25px; width: 100%; max-width: 450px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); display: flex; justify-content: center; padding: 10px; color: #333; }
+        .card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 20px; width: 100%; max-width: 400px; }
         
-        .header-nav { margin-bottom: 20px; display: flex; gap: 10px; flex-direction: column; }
-        select, input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 1rem; box-sizing: border-box; margin-top: 5px; }
-        .btn-add { background: var(--main-green); color: white; border: none; padding: 12px; cursor: pointer; border-radius: 10px; font-weight: bold; width: 100%; }
-
-        .screen { background: #e0ebe0; border: 4px solid var(--main-green); border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 20px; }
-        #plant-img { width: 180px; height: 180px; object-fit: cover; border-radius: 50%; border: 4px solid white; background: #ccc; margin: 10px auto; display: block; }
-        .upload-btn { background: #fff; padding: 8px 15px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; border: 1px solid #ccc; display: inline-block; margin-top: 10px; }
-
-        .box { background: #f9f9f9; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--main-green); }
-        .doctor-box { background: #e3f2fd; border-left-color: #2196f3; }
-        .pot-note { background: #fff9c4; border: 1px dashed #fbc02d; padding: 10px; margin-top: 10px; display: none; font-size: 0.9rem; border-radius: 10px; }
-
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-item { background: #fff; border: 1px solid #eee; padding: 10px; border-radius: 10px; text-align: center; font-size: 0.8rem; }
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .actions button { border: none; padding: 15px; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; }
+        .header-section { margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        select, input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; font-size: 1rem; box-sizing: border-box; margin-bottom: 10px; }
         
+        .btn { background: var(--main-green); color: white; border: none; padding: 12px; cursor: pointer; border-radius: 10px; font-weight: bold; width: 100%; margin-bottom: 10px; }
+        .btn-action { padding: 10px; font-size: 0.8rem; }
+
+        .screen { background: #e0ebe0; border: 3px solid var(--main-green); border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 15px; }
+        #plant-img { width: 160px; height: 160px; object-fit: cover; border-radius: 50%; border: 3px solid white; background: #ddd; margin: 0 auto 10px; display: block; }
+        
+        .info-box { background: #fdfdfd; padding: 15px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 15px; }
+        .label-text { font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .stat-item { background: #f1f1f1; padding: 8px; border-radius: 8px; text-align: center; font-size: 0.75rem; border: 1px solid #e0e0e0; }
+        
+        .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .blue { background: #4dabf7; } .orange { background: #fab005; } .cyan { background: #3bc9db; } .dry-btn { background: #ff922b; }
+
         #image-input { display: none; }
+        .pot-result { background: #fff9c4; padding: 10px; border-radius: 8px; margin-top: 10px; display: none; font-size: 0.85rem; border: 1px dashed #fbc02d; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="header-nav">
-        <label><b>🌿 Valitse kasvi:</b></label>
-        <select id="plant-selector" onchange="changePlant()"></select>
-        <button class="btn-add" onclick="addNewPlant()">+ Lisää uusi kasvi</button>
+    <div class="header-section">
+        <span class="label-text">Valitse kasvi:</span>
+        <select id="plant-selector" onchange="switchPlant()"></select>
+        <button class="btn" onclick="addNewPlant()">+ Lisää uusi kasvi</button>
     </div>
 
     <div class="screen">
-        <h2 id="title-name">Kasvi</h2>
-        <img id="plant-img" src="" alt="Kasvin kuva">
-        <label class="upload-btn" for="image-input">📸 Päivitä kuva</label>
+        <h2 id="display-name" style="margin:0 0 10px 0;">Kasvi</h2>
+        <img id="plant-img" src="" alt="Kuva">
+        <button class="btn" style="width:auto; padding:5px 15px; font-size:0.8rem;" onclick="document.getElementById('image-input').click()">📸 Vaihda kuva</button>
         <input type="file" id="image-input" accept="image/*">
     </div>
 
-    <div class="box">
-        <label><b>Kasvin nimi:</b></label>
-        <input type="text" id="edit-name" oninput="updateData()">
+    <div class="info-box">
+        <span class="label-text">Muokkaa nimeä:</span>
+        <input type="text" id="input-name" placeholder="Nimi" oninput="saveCurrentData()">
         
-        <label style="margin-top:10px; display:block;"><b>Ruukun halkaisija (cm):</b></label>
-        <input type="number" id="edit-pot" oninput="updateData()">
+        <span class="label-text">Ruukun koko (cm):</span>
+        <input type="number" id="input-pot" placeholder="esim. 12" oninput="saveCurrentData()">
         
-        <button class="btn-add" style="margin-top:15px;" onclick="showPotAdvice()">🛒 Tee kauppalappu ruukulle</button>
-        <div id="pot-advice" class="pot-note"></div>
+        <button class="btn" style="background:#666;" onclick="showPotAdvice()">🛒 Ruukku-muistilappu</button>
+        <div id="pot-advice" class="pot-result"></div>
     </div>
 
-    <div class="box doctor-box">
-        <strong>👨‍⚕️ Kasvitohtori</strong>
-        <select id="doctor-select" onchange="runDoctor()">
-            <option value="">-- Onko kasvi elossa? --</option>
-            <option value="scratch">Kynsitesti (onko vihreää?)</option>
-            <option value="dry">Varsi on kuiva ja ruskea</option>
-            <option value="soft">Varsi on pehmeä/löllö</option>
-            <option value="roots">Juuret ovat mullan alla</option>
-        </select>
-        <div id="doctor-msg" style="margin-top:10px; font-size:0.85rem; font-style:italic;"></div>
+    <div class="stats-grid">
+        <div class="stat-item">💧 Kasteltu:<br><b id="view-water">-</b></div>
+        <div class="stat-item">🧪 Lannoitettu:<br><b id="view-feed">-</b></div>
+        <div class="stat-item">☁️ Suihkutettu:<br><b id="view-mist">-</b></div>
+        <div class="stat-item">☀️ Kuivattu:<br><b id="view-dry">-</b></div>
     </div>
 
-    <div class="stats">
-        <div class="stat-item">💧 Kasteltu:<br><b id="st-water">-</b></div>
-        <div class="stat-item">🧪 Lannoitettu:<br><b id="st-feed">-</b></div>
-        <div class="stat-item">☁️ Suihkutettu:<br><b id="st-mist">-</b></div>
-        <div class="stat-item">☀️ Kuivattu:<br><b id="st-dry">-</b></div>
-    </div>
-
-    <div class="actions">
-        <button style="background:#4dabf7;" onclick="doAction('water')">Kastele</button>
-        <button style="background:#fab005;" onclick="doAction('feed')">Lannoita</button>
-        <button style="background:#3bc9db;" onclick="doAction('mist')">Suihkuta</button>
-        <button style="background:#ff922b;" onclick="doAction('dry')">Kuivaa</button>
+    <div class="actions-grid">
+        <button class="btn btn-action blue" onclick="recordAction('water')">Kastele</button>
+        <button class="btn btn-action orange" onclick="recordAction('feed')">Lannoita</button>
+        <button class="btn btn-action cyan" onclick="recordAction('mist')">Suihkuta</button>
+        <button class="btn btn-action dry-btn" onclick="recordAction('dry')">Kuivaa</button>
     </div>
 </div>
 
 <script>
-    // Alustetaan tiedot tai haetaan muistista
-    let plants = JSON.parse(localStorage.getItem('kasvigalleria_final')) || [
-        { id: 1, name: "Afrikan fiikus", pot: 12, water: "-", feed: "-", mist: "-", dry: "-", img: "" }
+    // HUOM: Vaihdettu tallennusavain 'kasvigalleria_V3', jotta vanha bugitiedosto ei sotke
+    let plantList = JSON.parse(localStorage.getItem('kasvigalleria_V3')) || [
+        { id: Date.now(), name: "Afrikan fiikus", pot: 12, water: "-", feed: "-", mist: "-", dry: "-", img: "" }
     ];
-    let activeId = plants[0].id;
+    let activePlantId = plantList[0].id;
+
+    function init() {
+        renderSelector();
+        showActivePlant();
+    }
 
     function renderSelector() {
         const sel = document.getElementById('plant-selector');
-        sel.innerHTML = plants.map(p => `<option value="${p.id}" ${p.id == activeId ? 'selected' : ''}>${p.name}</option>`).join('');
-        loadPlant();
+        sel.innerHTML = "";
+        plantList.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.innerText = p.name;
+            opt.selected = (p.id == activePlantId);
+            sel.appendChild(opt);
+        });
     }
 
-    function changePlant() {
-        activeId = document.getElementById('plant-selector').value;
-        loadPlant();
+    function switchPlant() {
+        activePlantId = document.getElementById('plant-selector').value;
+        showActivePlant();
     }
 
     function addNewPlant() {
-        const newP = { id: Date.now(), name: "Uusi kasvi", pot: 0, water: "-", feed: "-", mist: "-", dry: "-", img: "" };
-        plants.push(newP);
-        activeId = newP.id;
-        save();
+        const newObj = { id: Date.now(), name: "Uusi kasvi", pot: "", water: "-", feed: "-", mist: "-", dry: "-", img: "" };
+        plantList.push(newObj);
+        activePlantId = newObj.id;
+        saveToStorage();
         renderSelector();
+        showActivePlant();
     }
 
-    function loadPlant() {
-        const p = plants.find(x => x.id == activeId);
+    function showActivePlant() {
+        const p = plantList.find(x => x.id == activePlantId);
         if(!p) return;
 
-        document.getElementById('title-name').innerText = p.name;
-        document.getElementById('edit-name').value = p.name;
-        document.getElementById('edit-pot').value = p.pot || "";
+        document.getElementById('display-name').innerText = p.name;
+        document.getElementById('input-name').value = p.name;
+        document.getElementById('input-pot').value = p.pot;
         
-        // Kuvan lataus: Jos kuvaa ei ole, käytetään harmaata pohjaa
-        const imgDisplay = document.getElementById('plant-img');
-        imgDisplay.src = p.img || "https://via.placeholder.com/180?text=Ota+kuva";
+        document.getElementById('view-water').innerText = p.water;
+        document.getElementById('view-feed').innerText = p.feed;
+        document.getElementById('view-mist').innerText = p.mist;
+        document.getElementById('view-dry').innerText = p.dry;
+
+        const imgEl = document.getElementById('plant-img');
+        imgEl.src = p.img || "https://via.placeholder.com/160?text=Ei+kuvaa";
         
-        document.getElementById('st-water').innerText = p.water;
-        document.getElementById('st-feed').innerText = p.feed;
-        document.getElementById('st-mist').innerText = p.mist;
-        document.getElementById('st-dry').innerText = p.dry;
-        
-        // Nollataan aputekstit
         document.getElementById('pot-advice').style.display = 'none';
-        document.getElementById('doctor-msg').innerText = "";
-        document.getElementById('doctor-select').value = "";
     }
 
-    function updateData() {
-        const p = plants.find(x => x.id == activeId);
-        p.name = document.getElementById('edit-name').value;
-        p.pot = document.getElementById('edit-pot').value;
+    function saveCurrentData() {
+        const p = plantList.find(x => x.id == activePlantId);
+        p.name = document.getElementById('input-name').value;
+        p.pot = document.getElementById('input-pot').value;
         
-        document.getElementById('title-name').innerText = p.name;
+        document.getElementById('display-name').innerText = p.name;
         
-        // Päivitetään nimi pudotusvalikkoon
-        const option = document.querySelector(`#plant-selector option[value="${activeId}"]`);
-        if(option) option.innerText = p.name;
+        // Päivitetään nimi selectoriin
+        const opt = document.querySelector(`#plant-selector option[value="${activePlantId}"]`);
+        if(opt) opt.innerText = p.name;
         
-        save();
+        saveToStorage();
     }
 
-    function doAction(type) {
-        const p = plants.find(x => x.id == activeId);
+    function recordAction(type) {
+        const p = plantList.find(x => x.id == activePlantId);
         p[type] = new Date().toLocaleDateString('fi-FI');
-        save();
-        loadPlant();
+        saveToStorage();
+        showActivePlant();
     }
 
-    function save() { 
-        localStorage.setItem('kasvigalleria_final', JSON.stringify(plants)); 
+    function saveToStorage() {
+        localStorage.setItem('kasvigalleria_V3', JSON.stringify(plantList));
     }
 
-    // Kuvan käsittely korjattu
+    // Kuvan tallennus korjattu
     document.getElementById('image-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+
         const reader = new FileReader();
         reader.onload = function() {
-            const p = plants.find(x => x.id == activeId);
+            const p = plantList.find(x => x.id == activePlantId);
             p.img = reader.result;
             document.getElementById('plant-img').src = reader.result;
-            save();
+            saveToStorage();
         };
-        if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+        reader.readAsDataURL(file);
     });
 
     function showPotAdvice() {
-        const pot = parseInt(document.getElementById('edit-pot').value);
+        const p = plantList.find(x => x.id == activePlantId);
+        const size = parseInt(p.pot);
         const div = document.getElementById('pot-advice');
-        if(!pot) { 
-            div.innerHTML = "⚠️ Syötä nykyisen ruukun koko ensin!"; 
-        } else { 
-            div.innerHTML = `<strong>KAUPOILLE:</strong><br>Hanki uusi ruukku kokoa <b>${pot+2} - ${pot+4} cm</b>.<br>Varmista, että siinä on reikä pohjassa!`; 
+        if(!size) {
+            div.innerText = "Syötä nykyisen ruukun koko (cm) ensin.";
+        } else {
+            div.innerHTML = `<strong>MUISTIIN:</strong><br>Hanki uusi ruukku kokoa <b>${size+2} - ${size+4} cm</b>.`;
         }
         div.style.display = 'block';
     }
 
-    function runDoctor() {
-        const val = document.getElementById('doctor-select').value;
-        const msg = document.getElementById('doctor-msg');
-        const tips = {
-            scratch: "Raaputa vartta kynnellä: jos alta paljastuu vihreää, kasvi on elossa! Jos se on ruskeaa, kokeile alempaa.",
-            dry: "Jos varsi napsahtaa poikki kuin kuiva oksa, se on kuollut. Jos se taipuu, siellä on vielä elämää.",
-            soft: "Pehmeä varsi on usein merkki mädästä. Leikkaa pehmeä osa pois terveeseen (kovaan) kohtaan asti.",
-            roots: "Tarkista juuret mullan alta: valkoiset = hyvä, ruskeat/löysät = liikaa vettä."
-        };
-        msg.innerText = tips[val] || "";
-    }
-
-    // Käynnistetään sivu
-    renderSelector();
+    init();
 </script>
 
 </body>
